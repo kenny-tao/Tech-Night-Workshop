@@ -55,12 +55,47 @@ jobs:
 
     env:
       envPrefix: ${{ inputs.ENVIRONMENT_PREFIX }}
-      
-    #steps:
 
-      #TODO: Add action to download the artifacts from the build job
-      #TODO: Add action to login to Azure
-      #TODO: Add action to deploy the Web App Bicep Template
-      #TODO: Add action to deploy the Web App
-      #TODO: Add action to configure the Web App Settings
-      #TODO: Add action to log out of Azure
+    steps:
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v3
+      id: download
+      with:
+        name: artifacts
+
+    - name: Log into Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy Bicep Template (Web App Infra)
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTIONID }}
+        resourceGroupName: '${{ inputs.ENVIRONMENT_PREFIX }}-${{inputs.RESOURCE_GROUP}}'
+        deploymentMode: '${{ inputs.DEPLOYMENT_MODE }}'
+        template: 'azuredeploy.bicep'
+        parameters: > 
+          envPrefix=${{ inputs.ENVIRONMENT_PREFIX }} 
+          webAppName=${{ inputs.AZURE_WEBAPP_NAME }}
+          sku=${{ inputs.AZURE_WEBAPP_SKU }}
+          linuxFxVersion=${{ inputs.AZURE_WEBAPP_LINUXFXVERSION }}
+          location=${{ inputs.LOCATION }}
+        failOnStdErr: false
+
+    - name: 'Deploy Web App'
+      uses: azure/webapps-deploy@v2
+      with: 
+        app-name: ${{ inputs.ENVIRONMENT_PREFIX }}-${{ inputs.AZURE_WEBAPP_NAME }}
+        package: ${{steps.download.outputs.download-path}}
+        startup-command: ${{ inputs.STARTUP_COMMAND }}
+
+    - name: Configure App Settings
+      uses: azure/appservice-settings@v1
+      with:
+        app-name: ${{ inputs.ENVIRONMENT_PREFIX }}-${{ inputs.AZURE_WEBAPP_NAME }}
+        app-settings-json: ${{ secrets.APP_SETTINGS }} 
+        connection-strings-json: ${{ secrets.CONNECTION_STRINGS }}
+
+    - name: Log out of Azure
+      run: az logout

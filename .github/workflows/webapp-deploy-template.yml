@@ -1,0 +1,66 @@
+###############################################################################
+# Author: <YOUR NAME>
+# Name: webapp-deploy-template
+#
+# This reusable workflow defines the steps required to deploy an Azure Web App
+# It is intended to be used by all Azure Web Apps workflows.
+###############################################################################
+
+name: webapp-deploy-template
+
+on: 
+  workflow_call:
+    inputs:
+      ENVIRONMENT_PREFIX:
+        required: true
+        type: string
+      ENVIRONMENT:
+        required: true
+        type: string
+      AZURE_WEBAPP_NAME:
+        required: true
+        type: string
+      AZURE_WEBAPP_SKU:
+        type: string
+        default: 'F1'
+      AZURE_WEBAPP_LINUXFXVERSION:
+        type: string
+        default: 'DOTNETCORE|6.0'
+      STARTUP_COMMAND:
+        type: string
+        default: ''
+      LOCATION:
+        type: string
+        default: 'canadacentral'
+      RESOURCE_GROUP:
+        required: true
+        type: string
+      DEPLOYMENT_MODE:
+        type: string
+        default: 'Incremental'
+    secrets:
+      AZURE_CREDENTIALS:
+        required: true
+      AZURE_SUBSCRIPTIONID:
+        required: true
+      APP_SETTINGS:
+        required: false
+      CONNECTION_STRINGS:
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT}}
+
+    env:
+      envPrefix: ${{ inputs.ENVIRONMENT_PREFIX }}
+      
+    #steps:
+
+      #TODO: Add action to download the artifacts from the build job
+      #TODO: Add action to login to Azure
+      #TODO: Add action to deploy the Web App Bicep Template
+      #TODO: Add action to deploy the Web App
+      #TODO: Add action to configure the Web App Settings
+      #TODO: Add action to log out of Azure

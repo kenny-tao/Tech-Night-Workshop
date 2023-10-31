@@ -16,6 +16,8 @@ on:
     branches: [ "main" ]
     paths:
       #TODO: Add path to WebAPI project
+  # TODO: add pull request events to trigger the workflow
+
   workflow_dispatch:
     inputs:
       reason:

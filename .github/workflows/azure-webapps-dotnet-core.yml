@@ -71,10 +71,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: |
-            ${{ env.WEBAPP_BASE_PATH }}/**/*.xml
-            ${{ env.WEBAPP_BASE_PATH }}/**/*.trx
-            ${{ env.WEBAPP_BASE_PATH }}/**/*.json
+          files: ${{ env.WEBAPP_BASE_PATH }}/**/*.trx
 
       # TODO: Add Action to Publish Web App 
       # TODO: Add Action to Upload Web App Artifacts for Deployment
